@@ -1,0 +1,9 @@
+{
+  "name": "tf-socket",
+  "version": "1.0.0",
+  "main": "app.js",
+  "license": "MIT",
+  "dependencies": {
+    "socket.io": "^2.0.3"
+  }
+}

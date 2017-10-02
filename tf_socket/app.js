@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const port = 3000 || process.env.PORT;
 const server = http.createServer((req, res) => {
   if (req.url=='/') {
     res.writeHead(200, {'Content-Type': 'text/html'});
@@ -14,4 +15,6 @@ const io = require('socket.io').listen(server);
 io.on("connection", (socket) => {
 
 })
-server.listen(3000);
+server.listen(3000, () => {
+  console.log(`localhost:${port}`);
+});

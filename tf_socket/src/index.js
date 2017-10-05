@@ -133,5 +133,9 @@ socket.on("returnOnLoad", (obj) => {
   console.log(obj);
   tf.player = obj.mark;
   console.log("player "+tf.player);
-  tf.opponent = obj.id;
-})
+  tf.opponent = obj.id;//相手のidをセット
+  socket.emit("setOpponentId", tf.opponent);//socketにもset
+});
+socket.on("bye", () => {//使ってない
+  window.alert("相手が切断しました。\nリダイレクトします。");
+});

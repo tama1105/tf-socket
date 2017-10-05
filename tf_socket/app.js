@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
       // socket.set("opponentId", tmpId);
       socket.to(tmpId).json.emit("returnOnLoad", {//相手に送信
         id: socket.id,
-        mark: mark.state
+        mark: mark.state,
       });
       mark.change();
       console.log("2");//dbg
@@ -52,7 +52,12 @@ io.on("connection", (socket) => {
       j: obj.j
     });
   });
+  socket.on("setOpponentId", (opp) => {
+    socket.opponentId = opp;
+    console.log("opp:"+socket.opponentId);
+  });
 });
 server.listen(3000, () => {
   console.log(`localhost:${port}`);
 });
+//あとは退出処理

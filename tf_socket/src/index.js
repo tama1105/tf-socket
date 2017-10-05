@@ -7,6 +7,7 @@
   socketが送られてきたとき自分のターン
   送ったら相手のターン
 */
+const socket = io.connect();
 let tf = {
   board: [
     ["", "", ""],
@@ -17,15 +18,23 @@ let tf = {
     if (this.board[i][j].value !== "") {
       console.log(this.msg);
       this.msg.textContent="置けない";
-    }else {
+      return 0;
+    } else{
       this.board[i][j].value = this.player;
-      this.changePlayer();//デバッグ用
-      this.changeTurn();
+      socket.json.emit("finishMyTurn", {
+        i: i,
+        j: j,
+        id: tf.opponent//相手のid
+      });
+      return 1;
+      //this.changePlayer();//デバッグ用
+      //this.changeTurn();//ここじゃない
     }
   },
   msg: document.getElementById('message'),
-  turn: "×",
+  turn: "○",
   player: "○",
+  opponent: "",
   changePlayer: function () {//仮のもの:デバッグ用
     if (this.player==="○") {
       this.player="×";
@@ -41,6 +50,7 @@ let tf = {
     }
   },
   judge: function () {
+    console.log("judge");
     let flag = 0;
     let drow = 0;
     //横判定
@@ -78,11 +88,13 @@ let tf = {
     //勝敗
     console.log(flag)
     if (flag===1) {
+      console.log("fin");
       window.alert(`${this.turn}の勝ち`)
-      window.location.href = "./index.html";
+      window.location.href = "./";
     }else if(flag===2){
+      console.log("fin");
       window.alert("引き分け")
-      window.location.href = "./index.html";
+      window.location.href = "./";
     }
   }
 }
@@ -98,9 +110,28 @@ tf.board[2][2] = document.getElementById('b8');
 for (let i = 0; i < tf.board.length; i++) {
   for(let j = 0; j < tf.board[i].length;j++){
     tf.board[i][j].addEventListener("click", () => {
-      tf.put(i, j);//置けるか判定
-      //socketで送る
-      tf.judge();
-    })
+      if (tf.turn===tf.player) {
+        if (tf.put(i, j)) {
+          tf.changeTurn();
+          tf.judge();
+        }
+      }else{
+        console.log();
+        tf.msg.textContent = "相手のターンです";
+      }
+    });
   }
 }
+socket.emit("onLoad");
+socket.on("turnChange", (obj) => {
+  console.log("changeTurn");
+  tf.board[obj.i][obj.j].value=tf.turn;
+  tf.changeTurn();
+  tf.judge();
+});
+socket.on("returnOnLoad", (obj) => {
+  console.log(obj);
+  tf.player = obj.mark;
+  console.log("player "+tf.player);
+  tf.opponent = obj.id;
+})
